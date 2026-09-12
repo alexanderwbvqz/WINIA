@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WinIA - Verificación de Ventas con IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0D1B2A;
+    --navy-dark:#080F1E;
+    --orange:#FF6600;
+    --orange-hover:#F97316;
+    --orange-active:#EA580C;
+    --green:#10B981;
+    --green-bg:#ECFDF5;
+    --green-text:#065F46;
+    --red:#EF4444;
+    --red-bg:#FEF2F2;
+    --red-text:#991B1B;
+    --amber:#F59E0B;
+    --amber-bg:#FFFBEB;
+    --amber-text:#92400E;
+    --bg:#F8FAFC;
+    --border:#E2E8F0;
+    --border-strong:#CBD5E1;
+    --text:#0D1B2A;
+    --text-muted:#64748B;
+    --text-soft:#94A3B8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand-font{font-family:'Plus Jakarta Sans',system-ui,sans-serif;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  .hidden{display:none !important;}
+  img{max-width:100%;}
+
+  /* ---------- Layout shells ---------- */
+  .screen{min-height:100vh;display:flex;flex-direction:column;}
+  .container{max-width:1200px;margin:0 auto;padding:0 24px;width:100%;}
+
+  /* ---------- Top nav (landing) ---------- */
+  .topbar{
+    background:var(--navy);
+    color:#fff;
+    padding:16px 0;
+    position:sticky;top:0;z-index:20;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .topbar .container{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-0.01em;}
+  .logo .mark{
+    width:36px;height:36px;border-radius:8px;background:var(--orange);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;
+    flex-shrink:0;
+  }
+  .logo .ia{color:var(--orange);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 20px;border-radius:6px;font-weight:600;font-size:14px;border:1px solid transparent;
+    transition:background .15s,border-color .15s,transform .05s;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--orange);color:#fff;}
+  .btn-primary:hover{background:var(--orange-hover);}
+  .btn-primary:disabled{background:#FCD9BB;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.25);}
+  .btn-ghost:hover{background:rgba(255,255,255,.08);}
+  .btn-outline{background:#fff;color:var(--text);border-color:var(--border-strong);}
+  .btn-outline:hover{background:#F1F5F9;}
+  .btn-danger{background:#fff;color:var(--red);border-color:var(--red);}
+  .btn-danger:hover{background:var(--red-bg);}
+  .btn-block{width:100%;}
+  .btn-sm{padding:8px 14px;font-size:13px;}
+
+  /* ---------- Landing hero ---------- */
+  .hero{padding:72px 0 56px;}
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;background:rgba(255,102,0,.08);
+    color:var(--orange);border:1px solid rgba(255,102,0,.25);padding:6px 14px;border-radius:999px;
+    font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  }
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .hero h1{font-size:44px;line-height:1.08;margin:20px 0 16px;letter-spacing:-0.02em;max-width:720px;}
+  .hero h1 span{color:var(--orange);}
+  .hero p.lead{font-size:17px;color:var(--text-muted);max-width:620px;line-height:1.6;margin:0 0 28px;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+  .stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:48px;}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:0 1px 3px 0 rgba(13,27,42,.04);}
+  .stat-card .label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft);margin-bottom:8px;}
+  .stat-card .value{font-size:30px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;}
+  .stat-card .value.green{color:var(--green);}
+  .stat-card .sub{font-size:13px;color:var(--text-muted);margin-top:4px;}
+
+  .section{padding:56px 0;}
+  .section-title{font-size:28px;margin:0 0 8px;letter-spacing:-0.015em;}
+  .section-sub{color:var(--text-muted);margin:0 0 32px;font-size:15px;max-width:640px;}
+  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;}
+  .feature-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:24px;}
+  .feature-card .icon{
+    width:42px;height:42px;border-radius:8px;background:var(--navy);color:var(--orange);
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  }
+  .feature-card h3{font-size:16px;margin:0 0 8px;}
+  .feature-card p{font-size:14px;color:var(--text-muted);line-height:1.55;margin:0;}
+
+  .footer{background:var(--navy);color:rgba(255,255,255,.65);padding:24px 0;margin-top:auto;}
+  .footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;}
+
+  /* ---------- Auth screen ---------- */
+  .auth-wrap{
+    flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,102,0,.06), transparent 40%),
+      var(--bg);
+  }
+  .auth-card{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 20px 25px -5px rgba(8,15,30,.08);width:100%;max-width:440px;overflow:hidden;}
+  .auth-head{padding:24px 28px 0;}
+  .back-link{font-size:13px;color:var(--text-muted);display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;}
+  .back-link:hover{color:var(--text);}
+  .tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:16px 28px 0;}
+  .tab{flex:1;text-align:center;padding:10px;font-size:14px;font-weight:600;color:var(--text-muted);background:#F8FAFC;border:none;}
+  .tab.active{background:#fff;color:var(--text);box-shadow:inset 0 -2px 0 var(--orange);}
+  .auth-body{padding:22px 28px 28px;}
+  .demo-box{
+    background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px;
+  }
+  .demo-box .title{font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:13px;}
+  .demo-box .title .lightning{color:var(--orange);}
+  .demo-account{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;
+    border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;
+  }
+  .demo-account:last-child{margin-bottom:0;}
+  .demo-account .role{
+    font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-soft);
+    display:block;margin-bottom:3px;
+  }
+  .demo-account .creds{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text);white-space:nowrap;}
+  .demo-account .creds .sep{color:var(--text-soft);margin:0 5px;}
+  .demo-account button{
+    flex-shrink:0;background:var(--orange);color:#fff;border:none;font-weight:700;font-size:12px;
+    padding:7px 14px;border-radius:6px;
+  }
+  .demo-account button:hover{background:var(--orange-hover);}
+  @media(max-width:420px){
+    .demo-account{flex-wrap:wrap;}
+    .demo-account .creds{white-space:normal;}
+  }
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .field .hint{font-size:12px;color:var(--text-soft);margin-top:5px;}
+  .input, select.input{
+    width:100%;padding:11px 12px;border:1px solid var(--border-strong);border-radius:6px;font-size:14px;
+    background:#fff;color:var(--text);font-family:inherit;
+  }
+  .input:focus, select.input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,102,0,.12);}
+  .input.error{border-color:var(--red);}
+  .pass-wrap{position:relative;}
+  .pass-wrap .input{padding-right:40px;}
+  .pass-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-soft);padding:6px;display:flex;}
+  .pass-toggle:hover{color:var(--text);}
+
+  .alert{
+    display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:8px;font-size:13.5px;margin-bottom:18px;
+  }
+  .alert-error{background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5;}
+  .alert-success{background:var(--green-bg);color:var(--green-text);border:1px solid #6EE7B7;}
+  .alert svg{flex-shrink:0;margin-top:1px;}
+
+  /* ---------- Dashboards ---------- */
+  .app-header{background:var(--navy);color:#fff;padding:14px 0;}
+  .app-header .container{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .app-header .who{text-align:right;}
+  .app-header .who .name{font-weight:700;font-size:14px;}
+  .app-header .who .code{font-size:12px;color:rgba(255,255,255,.6);}
+  .who-row{display:flex;align-items:center;gap:14px;}
+
+  .page-wrap{flex:1;padding:32px 0 56px;}
+  .page-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
+  .page-top h2{font-size:24px;margin:0 0 6px;display:flex;align-items:center;gap:10px;}
+  .badge-live{
+    background:var(--green-bg);color:var(--green-text);border:1px solid #6EE7B7;font-size:11px;font-weight:700;
+    padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;
+  }
+  .page-top p{margin:0;color:var(--text-muted);font-size:14px;}
+
+  .cards-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px;}
+  .metric-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:0 1px 3px 0 rgba(13,27,42,.04);}
+  .metric-card .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .metric-card .top-row .label{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-soft);}
+  .metric-card .num{font-size:32px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;}
+  .metric-card .num.green{color:var(--green);}
+  .metric-card .num.red{color:var(--red);}
+  .metric-card .desc{font-size:12.5px;color:var(--text-muted);margin-top:4px;}
+  .icon-chip{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+  .icon-chip.gray{background:#F1F5F9;color:var(--text-muted);}
+  .icon-chip.green{background:var(--green-bg);color:var(--green);}
+  .icon-chip.red{background:var(--red-bg);color:var(--red);}
+
+  .panel{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px 0 rgba(13,27,42,.04);margin-bottom:24px;}
+  .panel-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .panel-head h3{margin:0;font-size:15px;}
+  .panel-head .sub{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px;}
+  thead th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft);
+    padding:10px 20px;border-bottom:1px solid var(--border);background:#F8FAFC;white-space:nowrap;
+  }
+  tbody td{padding:14px 20px;border-bottom:1px solid var(--border);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#FAFBFC;}
+  .cell-code{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--navy);}
+  .cell-sub{font-size:12px;color:var(--text-soft);margin-top:2px;}
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    padding:4px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.02em;
+  }
+  .badge::before{content:'';width:6px;height:6px;border-radius:50%;}
+  .badge-verificada{background:var(--green-bg);color:var(--green-text);border:1px solid #6EE7B7;}
+  .badge-verificada::before{background:var(--green);}
+  .badge-rechazada{background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5;}
+  .badge-rechazada::before{background:var(--red);}
+  .badge-pendiente{background:#F8FAFC;color:var(--text-muted);border:1px solid var(--border-strong);}
+  .badge-pendiente::before{background:var(--text-soft);}
+  .empty-state{padding:56px 20px;text-align:center;color:var(--text-muted);font-size:14px;}
+  .empty-state .big{font-size:32px;margin-bottom:10px;}
+
+  select.filter{padding:8px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:13px;background:#fff;}
+
+  /* ---------- Wizard ---------- */
+  .wizard-ctx{background:var(--navy);color:#fff;padding:12px 0;}
+  .wizard-ctx .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:13px;}
+  .wizard-ctx .left{display:flex;gap:16px;align-items:center;flex-wrap:wrap;color:rgba(255,255,255,.85);}
+  .wizard-ctx .left b{color:#fff;}
+
+  .steps-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0;}
+  .step-item{
+    display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  }
+  .step-item.current{background:#FFF4EC;border-color:var(--orange);}
+  .step-circle{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:14px;background:#E2E8F0;color:var(--text-muted);
+  }
+  .step-circle.done{background:var(--green);color:#fff;}
+  .step-circle.active{background:var(--orange);color:#fff;}
+  .step-text .t1{font-weight:700;font-size:13.5px;}
+  .step-text .t2{font-size:11.5px;color:var(--text-muted);}
+
+  .form-panel{background:#fff;border:1px solid var(--border);border-radius:10px;padding:28px;margin-bottom:20px;}
+  .form-panel h3{margin:0 0 4px;font-size:19px;}
+  .form-panel .desc{color:var(--text-muted);font-size:13.5px;margin:0 0 22px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:600px){.grid-2{grid-template-columns:1fr;}}
+
+  .plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+  .plan-card{
+    border:2px solid var(--border);border-radius:10px;padding:20px;cursor:pointer;position:relative;background:#fff;transition:border-color .15s;
+  }
+  .plan-card:hover{border-color:var(--border-strong);}
+  .plan-card.selected{border-color:var(--orange);background:#FFF9F5;}
+  .plan-card .tag{
+    position:absolute;top:-11px;left:16px;background:var(--orange);color:#fff;font-size:10.5px;font-weight:700;
+    padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;
+  }
+  .plan-card h4{margin:6px 0 10px;font-size:16px;}
+  .plan-card ul{margin:0 0 14px;padding-left:18px;font-size:12.5px;color:var(--text-muted);line-height:1.7;}
+  .plan-card .price-line{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;background:#F8FAFC;border-radius:6px;padding:10px 12px;color:var(--text);
+  }
+  .plan-card .radio-dot{
+    position:absolute;top:16px;right:16px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);
+  }
+  .plan-card.selected .radio-dot{border-color:var(--orange);background:var(--orange);
+    background-image:radial-gradient(circle,#fff 0 4px, transparent 5px);}
+
+  .price-breakdown{
+    background:#FFF4EC;border:1px solid #FFC38A;border-radius:10px;padding:22px;margin-bottom:22px;
+  }
+  .price-breakdown .pb-title{font-weight:800;font-size:15px;color:#9A3412;margin:0 0 16px;display:flex;align-items:center;gap:8px;}
+  .pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  @media(max-width:560px){.pb-grid{grid-template-columns:1fr;}}
+  .pb-box{background:#fff;border:1px solid #FFD9B3;border-radius:8px;padding:14px 16px;}
+  .pb-box .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted);margin-bottom:6px;}
+  .pb-box .v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--navy);}
+  .pb-box.regular .v{color:#9A3412;}
+  .pb-box .note{font-size:11.5px;color:var(--text-soft);margin-top:4px;}
+  .pb-check{
+    display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #FFD9B3;border-radius:8px;padding:14px 16px;
+    font-size:13.5px;font-weight:600;
+  }
+  .pb-check input{width:18px;height:18px;margin-top:1px;accent-color:var(--orange);flex-shrink:0;}
+
+  .review-block{border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px;}
+  .review-block h4{margin:0 0 10px;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft);}
+  .review-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;border-bottom:1px dashed var(--border);}
+  .review-row:last-child{border-bottom:none;}
+  .review-row span:first-child{color:var(--text-muted);}
+  .review-row span:last-child{font-weight:600;text-align:right;}
+
+  .wizard-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  .wizard-actions .right-group{display:flex;gap:10px;flex-wrap:wrap;}
+
+  @media(max-width:700px){
+    .hero h1{font-size:32px;}
+    .steps-bar{grid-template-columns:repeat(2,1fr);}
+    .page-top{flex-direction:column;}
+  }
+
+  /* ---------- Pitch sections ---------- */
+  .section-dark{background:var(--navy);color:#fff;padding:64px 0;}
+  .section-dark .section-title{color:#fff;}
+  .section-dark .section-sub{color:rgba(255,255,255,.65);}
+
+  .bigstat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+  @media(max-width:700px){.bigstat-grid{grid-template-columns:1fr;}}
+  .bigstat-card{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:22px;
+  }
+  .bigstat-card .num{font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:var(--orange);}
+  .bigstat-card .desc{font-size:13.5px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.5;}
+  .bigstat-card .delta{font-size:12px;color:#6EE7B7;margin-top:6px;font-weight:600;}
+  .callout-red{
+    background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:16px 20px;
+    font-size:14.5px;color:#FCA5A5;
+  }
+  .callout-red b{color:#fff;}
+  .source-note{font-size:12px;color:var(--text-soft);margin-top:16px;font-style:italic;}
+  .section-dark .source-note{color:rgba(255,255,255,.45);}
+
+  .step-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:12px;}
+  @media(max-width:700px){.step-flow{grid-template-columns:1fr;}}
+  .flow-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;}
+  .flow-card .flow-num{
+    width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--orange);font-weight:800;font-size:13px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  }
+  .flow-card h3{font-size:16px;margin:0 0 8px;}
+  .flow-card p{font-size:13.5px;color:var(--text-muted);margin:0;line-height:1.55;}
+
+  .stage-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .stage-table th{background:#F8FAFC;text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft);border-bottom:1px solid var(--border);}
+  .stage-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top;}
+  .stage-table tr:last-child td{border-bottom:none;}
+  .stage-table .stage-num{
+    font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--orange);
+  }
+  .table-wrap{overflow-x:auto;margin-bottom:16px;}
+
+  .win-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:800px){.win-grid{grid-template-columns:1fr;}}
+  .win-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;}
+  .win-card .who{font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;}
+  .win-card ul{margin:0;padding-left:18px;font-size:14px;color:var(--text);line-height:1.9;}
+  .win-card .metrics{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--green-text);line-height:1.8;}
+
+  .compare-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .compare-table th{padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.03em;text-align:left;border-bottom:1px solid var(--border);}
+  .compare-table th.hoy{background:#F8FAFC;color:var(--text-muted);}
+  .compare-table th.con{background:#FFF4EC;color:#9A3412;}
+  .compare-table td{padding:14px 16px;font-size:13.5px;border-bottom:1px solid var(--border);}
+  .compare-table tr:last-child td{border-bottom:none;}
+  .compare-table td.label{font-weight:700;color:var(--text-soft);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;}
+  .compare-table td.win{color:var(--green-text);font-weight:600;background:#F7FEFB;}
+
+  .tracion-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:800px){.tracion-grid{grid-template-columns:1fr;}}
+  .tracion-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;}
+  .tracion-card .place{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
+  .tracion-card p{font-size:13.5px;color:var(--text-muted);line-height:1.6;margin:0;}
+  .tracion-card b{color:var(--text);}
+
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:800px){.team-grid{grid-template-columns:1fr;}}
+  .team-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;text-align:left;}
+  .avatar-circle{
+    width:46px;height:46px;border-radius:50%;background:var(--navy);color:var(--orange);font-weight:800;font-size:15px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  }
+  .team-card h3{font-size:15px;margin:0 0 2px;}
+  .team-card .role{font-size:12.5px;color:var(--orange);font-weight:600;margin-bottom:10px;}
+  .team-card p{font-size:13px;color:var(--text-muted);margin:0;line-height:1.55;}
+
+  .cta-band{
+    background:var(--navy);border-radius:16px;padding:48px 36px;text-align:center;color:#fff;
+    background-image:radial-gradient(circle at 20% 20%, rgba(255,102,0,.18), transparent 45%);
+  }
+  .cta-band h2{font-size:26px;margin:0 0 8px;line-height:1.35;}
+  .cta-band .tagline{color:var(--orange);font-weight:700;margin:14px 0 26px;font-size:15px;}
+  .cta-band .actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<!-- =================== LANDING =================== -->
+<div id="screen-landing" class="screen">
+  <header class="topbar">
+    <div class="container">
+      <div class="logo"><span class="mark">W</span><span>Win<span class="ia">IA</span></span></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" onclick="goTo('auth')">Panel del Vendedor</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <span class="pill"><span class="dot"></span> Verificación de ventas con IA conversacional</span>
+      <h1>Que lo prometido sea <span>lo entregado</span></h1>
+      <p class="lead">WinIA llama a cada cliente antes de instalar el servicio y confirma, en menos de dos minutos, que la venta registrada es la venta que realmente aceptó. Sin auditores, sin muestreo, sobre el 100% de las ventas.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" style="padding:13px 26px;" onclick="goTo('auth')">Ir al Panel del Vendedor →</button>
+        <button class="btn btn-outline" style="padding:13px 26px;" onclick="scrollToFeatures()">Ver la plataforma</button>
+      </div>
+      <div class="stat-strip">
+        <div class="stat-card"><div class="label">Cobertura de auditoría</div><div class="value green">100%</div><div class="sub">De las ventas, una por una — no por muestreo</div></div>
+        <div class="stat-card"><div class="label">Tiempo de verificación</div><div class="value">&lt; 2 min</div><div class="sub">Antes de que salga el técnico</div></div>
+        <div class="stat-card"><div class="label">Checkpoints por llamada</div><div class="value">6</div><div class="sub">Identidad, plan, precio, promo, permanencia, dirección</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTEXTO / PROBLEMA -->
+  <section class="section-dark">
+    <div class="container">
+      <h2 class="section-title">La mayoría de reclamos telecom no nacen en la red: nacen en la venta</h2>
+      <p class="section-sub">Un cliente acepta un plan a S/ 79.90 al mes. Meses después, sin que nadie se lo haya explicado, el cobro sube a S/ 89.90. El resultado casi siempre es el mismo: un reclamo y una baja anticipada del servicio — un costo que, para ese momento, ya no se puede recuperar.</p>
+      <div class="bigstat-grid">
+        <div class="bigstat-card">
+          <div class="num">1 257 286</div>
+          <div class="desc">Reclamos en telecomunicaciones en el Perú durante 2026</div>
+          <div class="delta">+11.6% vs. 2025</div>
+        </div>
+        <div class="bigstat-card">
+          <div class="num">254 437</div>
+          <div class="desc">Reclamos solo de internet fijo</div>
+          <div class="delta">+53.1% en un año</div>
+        </div>
+        <div class="bigstat-card">
+          <div class="num">278 509</div>
+          <div class="desc">Nacen en la venta: promesas incumplidas y ventas no solicitadas</div>
+          <div class="delta" style="color:#FCA5A5;">1 de cada 5</div>
+        </div>
+      </div>
+      <div class="callout-red"><b>4 de cada 10</b> reclamos son por facturación y cobro: el cliente paga algo distinto a lo que le prometieron.</div>
+      <p class="source-note">Fuente: OSIPTEL — reclamos de usuarios de telecomunicaciones, balance 2025.</p>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Un agente de IA que verifica antes de instalar</h2>
+      <p class="section-sub">Apenas se registra una venta, WinIA llama al cliente, conversa con él en su propio idioma y contrasta cada respuesta contra el plan cargado en el sistema.</p>
+      <div class="step-flow">
+        <div class="flow-card"><div class="flow-num">01</div><h3>Escucha</h3><p>Llama al cliente y le repite, en su idioma, qué compró.</p></div>
+        <div class="flow-card"><div class="flow-num">02</div><h3>Verifica</h3><p>Contrasta cada respuesta contra el plan registrado en el sistema.</p></div>
+        <div class="flow-card"><div class="flow-num">03</div><h3>Decide</h3><p>Aprueba la venta, la deriva a validación humana o bloquea la instalación.</p></div>
+      </div>
+      <div class="table-wrap" style="margin-top:24px;">
+        <table class="stage-table">
+          <thead><tr><th>#</th><th>Etapa</th><th>Detalle</th></tr></thead>
+          <tbody>
+            <tr><td class="stage-num">01</td><td>Venta registrada</td><td>El vendedor la carga en la plataforma (web/app). Queda congelada.</td></tr>
+            <tr><td class="stage-num">02</td><td>Llamada de verificación</td><td>El agente de IA llama al cliente y conversa.</td></tr>
+            <tr><td class="stage-num">03</td><td>Seis checkpoints</td><td>Identidad · plan · precio · fin de promoción · permanencia · dirección.</td></tr>
+            <tr><td class="stage-num">04</td><td>Score de riesgo</td><td>Explicable: indica en qué señal se basó la decisión.</td></tr>
+            <tr><td class="stage-num">05</td><td>Resultado</td><td>Aprueba · valida con un humano · bloquea.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="feature-card" style="margin-top:20px;">
+        <h3 style="margin-top:0;">¿Para quién es?</h3>
+        <p style="margin:0;">Operadores con fuerza de venta tercerizada (telecomunicaciones, ISPs regionales) y, en general, cualquier venta con una promesa a plazo: gas, seguros, energía, créditos.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFICIOS -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <h2 class="section-title">Un mismo mecanismo, tres partes interesadas en que funcione</h2>
+      <div class="win-grid">
+        <div class="win-card">
+          <div class="who">Cliente</div>
+          <ul><li>Sabe exactamente qué compró y cuándo sube el precio.</li><li>Cero sorpresas en la factura.</li></ul>
+        </div>
+        <div class="win-card">
+          <div class="who">Vendedor</div>
+          <ul><li>Comisión garantizada en cuanto el cliente confirma la venta.</li><li>La venta correctamente explicada se paga más rápido.</li></ul>
+        </div>
+        <div class="win-card">
+          <div class="who">Operador</div>
+          <ul><li>Menos recursos invertidos en instalaciones que terminan en baja.</li></ul>
+          <div class="metrics">−40% instalaciones fallidas<br>−25% bajas anticipadas<br>−60% reclamos de facturación</div>
+        </div>
+      </div>
+      <p class="source-note">Cifras de impacto proyectadas sobre un flujo de ventas comercial típico; se validan con datos reales durante el piloto.</p>
+    </div>
+  </section>
+
+  <!-- COMPARATIVA -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <h2 class="section-title">La auditoría tradicional llega tarde. WinIA llega antes.</h2>
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead><tr><th style="background:#fff;border-bottom:1px solid var(--border);"></th><th class="hoy">Auditoría tradicional</th><th class="con">Con WinIA</th></tr></thead>
+          <tbody>
+            <tr><td class="label">Cobertura</td><td>1–2% de las llamadas, por muestreo</td><td class="win">100% de las ventas, una por una</td></tr>
+            <tr><td class="label">Momento</td><td>Después de instalar y facturar</td><td class="win">Antes de que salga el técnico</td></tr>
+            <tr><td class="label">Resultado</td><td>Un reclamo y un cliente perdido</td><td class="win">Venta corregida o bloqueada, con evidencia</td></tr>
+            <tr><td class="label">Quién decide</td><td>Un auditor, semanas después</td><td class="win">Un score explicable, en minutos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESPALDO / EVIDENCIA -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <h2 class="section-title">El modelo de verificación por voz no es nuevo — falta traerlo al campo</h2>
+      <div class="tracion-grid">
+        <div class="tracion-card">
+          <div class="place">Estados Unidos · Third Party Verification</div>
+          <p>Verificar la venta con un tercero antes de activar el servicio es una práctica establecida en telecomunicaciones y energía desde los años 90, impulsada por las reglas de la FCC contra el cambio no autorizado de operador.</p>
+        </div>
+        <div class="tracion-card">
+          <div class="place">Control de calidad con IA</div>
+          <p>El control de calidad manual audita apenas entre <b>1% y 2%</b> de las llamadas. Plataformas de QA con IA como Observe.AI, Convin o Level AI ya auditan el <b>100%</b>.</p>
+        </div>
+        <div class="tracion-card">
+          <div class="place">Impacto medido</div>
+          <p>Un centro de contacto que migró a auditoría de IA sobre el 100% de sus llamadas reportó <b>−30%</b> en escalaciones por incumplimiento y <b>+22%</b> en satisfacción del cliente.</p>
+        </div>
+      </div>
+      <p class="source-note">Fuentes: FCC (reglas anti-slamming, 47 CFR 64.1120) · AnswerNet, TPV en telecom · Gistly, «The AI QA Revolution: From Sampling 2% to Auditing 100%».</p>
+    </div>
+  </section>
+
+  <!-- EQUIPO -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <h2 class="section-title">Un equipo con experiencia directa en telecomunicaciones e IA de voz</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="avatar-circle">CF</div>
+          <h3>Cristhian Fernández</h3>
+          <div class="role">Ingeniero de Sistemas</div>
+          <p>+10 años construyendo sistemas. Actualmente en una empresa internacional de telecomunicaciones. Maestría en Inteligencia Artificial.</p>
+        </div>
+        <div class="team-card">
+          <div class="avatar-circle">WB</div>
+          <h3>Walter Barreto</h3>
+          <div class="role">Ingeniero de Sistemas</div>
+          <p>+3 años en desarrollo de software. Especialista en backend y bases de datos.</p>
+        </div>
+        <div class="team-card">
+          <div class="avatar-circle">UR</div>
+          <h3>Ubil Rodríguez</h3>
+          <div class="role">Ingeniero de Sistemas</div>
+          <p>+5 años en frontend, con experiencia en llamadas con LLM y ElevenLabs. Maestría en IA por la UNI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATAFORMA / PRODUCTO -->
+  <section class="section" id="features" style="padding-top:0;">
+    <div class="container">
+      <h2 class="section-title">Un panel para el equipo comercial, otro para la gestión</h2>
+      <p class="section-sub">Un mismo acceso para tu equipo comercial y para el área administrativa, cada uno con su propio panel.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="icon">💰</div>
+          <h3>Desglose de precio obligatorio</h3>
+          <p>El vendedor debe confirmar en pantalla el precio promocional del mes 1 y el precio regular desde el mes 2, antes de continuar con la venta.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🛡️</div>
+          <h3>Auditoría en tiempo real</h3>
+          <p>Cada venta registrada queda con estado de verificación: pendiente, verificada o rechazada, visible tanto para el vendedor como para el administrador.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📊</div>
+          <h3>Panel administrador</h3>
+          <p>Visión consolidada de todos los vendedores, ventas del sistema y métricas de cumplimiento en un solo dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIERRE -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-band">
+        <h2>Una venta mal hecha no se paga en la venta. Se paga después.<br>WinIA la detiene antes.</h2>
+        <div class="tagline">WinIA · Que lo prometido sea lo entregado.</div>
+        <div class="actions">
+          <button class="btn btn-primary" style="padding:13px 26px;" onclick="goTo('auth')">Ir al Panel del Vendedor →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div>WinIA · Verificación de ventas con IA</div>
+      <div>© 2026 WIN Telecomunicaciones. Entorno de Verificación Regulatoria OSIPTEL.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- =================== AUTH =================== -->
+<div id="screen-auth" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-head">
+        <a class="back-link" href="#" onclick="goTo('landing');return false;">← Volver al inicio</a>
+        <div class="logo" style="color:var(--text);"><span class="mark">W</span><span>Win<span class="ia">IA</span></span></div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" id="tab-login" onclick="setAuthMode('login')">Iniciar Sesión</button>
+        <button class="tab" id="tab-register" onclick="setAuthMode('register')">Registrar</button>
+      </div>
+      <div class="auth-body">
+
+        <div class="demo-box">
+          <div class="title"><span class="lightning">⚡</span> Ambiente Demo</div>
+          <div class="demo-account">
+            <div>
+              <span class="role">Vendedor</span>
+              <span class="creds">demo@vendedor.com<span class="sep">·</span>demo123</span>
+            </div>
+            <button type="button" onclick="fillDemo('vendedor')">Usar</button>
+          </div>
+          <div class="demo-account">
+            <div>
+              <span class="role">Administrador</span>
+              <span class="creds">admin@administrador.com<span class="sep">·</span>admin123</span>
+            </div>
+            <button type="button" onclick="fillDemo('admin')">Usar</button>
+          </div>
+        </div>
+
+        <div id="auth-alert"></div>
+
+        <!-- LOGIN FORM -->
+        <form id="form-login" onsubmit="handleLogin(event)">
+          <div class="field">
+            <label>Correo electrónico</label>
+            <input class="input" type="text" id="login-email" placeholder="nombre@vendedor.com o @administrador.com" autocomplete="username">
+            <div class="hint">El dominio debe contener "vendedor" o "administrador" para determinar tu panel.</div>
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <div class="pass-wrap">
+              <input class="input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+              <button type="button" class="pass-toggle" onclick="togglePass('login-password', this)">${ICON_EYE}</button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="padding:13px;">Ingresar a WinIA</button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
+          <div class="field">
+            <label>Nombre completo</label>
+            <input class="input" type="text" id="reg-nombre" placeholder="Ej. Carlos Mendívil Ruiz">
+          </div>
+          <div class="field">
+            <label>Código de vendedor</label>
+            <input class="input" type="text" id="reg-codigo" placeholder="Ej. VD-002">
+            <div class="hint">Si te registras como administrador puedes dejarlo vacío.</div>
+          </div>
+          <div class="field">
+            <label>Correo electrónico</label>
+            <input class="input" type="text" id="reg-email" placeholder="nombre@vendedor.com o @administrador.com">
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <div class="pass-wrap">
+              <input class="input" type="password" id="reg-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+              <button type="button" class="pass-toggle" onclick="togglePass('reg-password', this)">${ICON_EYE}</button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="padding:13px;">Crear cuenta</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== DASHBOARD VENDEDOR =================== -->
+<div id="screen-dash-vendedor" class="screen hidden">
+  <header class="app-header">
+    <div class="container">
+      <div class="logo"><span class="mark">W</span><span>Win<span class="ia">IA</span></span></div>
+      <div class="who-row">
+        <div class="who">
+          <div class="name" id="v-nombre">-</div>
+          <div class="code" id="v-codigo">-</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="logout()">${ICON_LOGOUT} Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <div class="container">
+      <div class="page-top">
+        <div>
+          <h2>Panel de Control de Ventas <span class="badge-live">Auditoría Activa</span></h2>
+          <p>Bienvenido, <b id="v-nombre2">Vendedor</b>. Registra ventas con total transparencia y monitorea su verificación.</p>
+        </div>
+        <button class="btn btn-primary" onclick="startWizard()">${ICON_PLUS} Registrar Nueva Venta</button>
+      </div>
+
+      <div class="cards-3">
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Total Ventas</span><span class="icon-chip gray">📋</span></div>
+          <div class="num" id="v-total">0</div>
+          <div class="desc">Registros emitidos en sistema</div>
+        </div>
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Verificadas</span><span class="icon-chip green">${ICON_CHECK}</span></div>
+          <div class="num green" id="v-verificadas">0</div>
+          <div class="desc">Cliente confirmó precio y checkpoints</div>
+        </div>
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Rechazadas</span><span class="icon-chip red">${ICON_ALERT}</span></div>
+          <div class="num red" id="v-rechazadas">0</div>
+          <div class="desc">Objeción en llamada o escalón tarifario</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Historial de Ventas</h3>
+            <div class="sub">Seguimiento del estado de verificación de cada contrato</div>
+          </div>
+        </div>
+        <div id="v-tabla-wrap" class="table-scroll"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== WIZARD ===================  -->
+<div id="screen-wizard" class="screen hidden">
+  <div class="wizard-ctx">
+    <div class="container">
+      <div class="left">
+        <span>● <b id="w-vendedor">Vendedor</b></span>
+        <span id="w-codigo">VD-000</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="cancelWizard()">Salir al Dashboard</button>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="container">
+      <div class="steps-bar" id="steps-bar"></div>
+      <div id="wizard-alert"></div>
+
+      <!-- STEP 1 -->
+      <div class="form-panel step-pane" id="step-1">
+        <h3>Datos del Cliente</h3>
+        <p class="desc">Ingresa la información básica del titular del contrato.</p>
+        <div class="field">
+          <label>Nombre completo *</label>
+          <input class="input" type="text" id="f-nombre" placeholder="Ej. Roberto Sánchez Torres">
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>DNI *</label>
+            <input class="input" type="text" id="f-dni" maxlength="8" inputmode="numeric" placeholder="8 dígitos">
+          </div>
+          <div class="field">
+            <label>Celular *</label>
+            <input class="input" type="text" id="f-celular" maxlength="9" inputmode="numeric" placeholder="9 dígitos">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="form-panel step-pane hidden" id="step-2">
+        <h3>Lugar de Instalación</h3>
+        <p class="desc">Indica la dirección exacta donde se realizará la instalación.</p>
+        <div class="field">
+          <label>Dirección *</label>
+          <input class="input" type="text" id="f-direccion" placeholder="Ej. Av. Balta 742, Dpto 301">
+        </div>
+        <div class="field">
+          <label>Distrito *</label>
+          <select class="input" id="f-distrito">
+            <option value="">Selecciona un distrito</option>
+            <option value="Chiclayo">Chiclayo</option>
+            <option value="La Victoria">La Victoria</option>
+            <option value="José Leonardo Ortiz">José Leonardo Ortiz</option>
+            <option value="Nueva Arica">Nueva Arica</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="form-panel step-pane hidden" id="step-3">
+        <h3>Seleccionar Plan</h3>
+        <p class="desc">Elige el plan contratado. El desglose de precio es obligatorio para continuar.</p>
+        <div class="plan-grid" id="plan-grid"></div>
+        <div id="price-breakdown-wrap"></div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="form-panel step-pane hidden" id="step-4">
+        <h3>Revisar Venta</h3>
+        <p class="desc">Verifica los datos antes de enviar el registro.</p>
+        <div id="review-wrap"></div>
+      </div>
+
+      <div class="wizard-actions">
+        <div>
+          <button class="btn btn-outline" id="btn-prev" onclick="prevStep()">← Anterior</button>
+        </div>
+        <div class="right-group">
+          <button class="btn btn-danger hidden" id="btn-cancel" onclick="cancelWizard()">Cancelar</button>
+          <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== DASHBOARD ADMIN =================== -->
+<div id="screen-dash-admin" class="screen hidden">
+  <header class="app-header">
+    <div class="container">
+      <div class="logo"><span class="mark">W</span><span>Win<span class="ia">IA</span></span> <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.55);margin-left:4px;">/ Administrador</span></div>
+      <div class="who-row">
+        <div class="who">
+          <div class="name" id="a-nombre">-</div>
+          <div class="code">Panel Administrador</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="logout()">${ICON_LOGOUT} Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <div class="container">
+      <div class="page-top">
+        <div>
+          <h2>Panel de Auditoría Global <span class="badge-live">OSIPTEL RES-138</span></h2>
+          <p>Visión consolidada de todos los vendedores y ventas registradas en el sistema.</p>
+        </div>
+      </div>
+
+      <div class="cards-3">
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Vendedores</span><span class="icon-chip gray">👤</span></div>
+          <div class="num" id="a-vendedores">0</div>
+          <div class="desc">Cuentas activas en el sistema</div>
+        </div>
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Total Ventas</span><span class="icon-chip gray">📋</span></div>
+          <div class="num" id="a-total">0</div>
+          <div class="desc">Registros en toda la red</div>
+        </div>
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Verificadas</span><span class="icon-chip green">${ICON_CHECK}</span></div>
+          <div class="num green" id="a-verificadas">0</div>
+          <div class="desc">Comisión confirmada</div>
+        </div>
+        <div class="metric-card">
+          <div class="top-row"><span class="label">Rechazadas</span><span class="icon-chip red">${ICON_ALERT}</span></div>
+          <div class="num red" id="a-rechazadas">0</div>
+          <div class="desc">En riesgo o con objeción</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Desempeño por Vendedor</h3><div class="sub">Totales y estado de verificación por asesor</div></div>
+        </div>
+        <div id="a-vendedores-tabla" class="table-scroll"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Todas las Ventas</h3><div class="sub">Historial completo del sistema</div></div>
+          <select class="filter" id="a-filtro-estado" onchange="renderAdmin()">
+            <option value="">Todos los estados</option>
+            <option value="VERIFICADA">Verificadas</option>
+            <option value="RECHAZADA">Rechazadas</option>
+            <option value="PENDIENTE">Pendientes</option>
+          </select>
+        </div>
+        <div id="a-ventas-tabla" class="table-scroll"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   ICONS (inline SVG, no external icon library)
+   ========================================================= */
+function svg(paths, extra){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '+(extra||'')+'>'+paths+'</svg>'; }
+const ICON_EYE = svg('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>');
+const ICON_EYE_OFF = svg('<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>');
+const ICON_LOGOUT = svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>');
+const ICON_PLUS = svg('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>');
+const ICON_CHECK = svg('<polyline points="20 6 9 17 4 12"/>');
+const ICON_ALERT = svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>');
+
+// Patch icon placeholders into markup that was authored with ${} template markers.
+document.body.innerHTML = document.body.innerHTML
+  .replaceAll('${ICON_EYE}', ICON_EYE)
+  .replaceAll('${ICON_LOGOUT}', ICON_LOGOUT)
+  .replaceAll('${ICON_PLUS}', ICON_PLUS)
+  .replaceAll('${ICON_CHECK}', ICON_CHECK)
+  .replaceAll('${ICON_ALERT}', ICON_ALERT);
+
+/* =========================================================
+   STATE (in-memory only, resets on reload)
+   ========================================================= */
+const PLANS = [
+  { id:'p850', nombre:'850 Mbps + DGO Hogar', tag:'Más Vendido', promo:59.50, mesesPromo:1, regular:119.00,
+    detalles:['Router Wi-Fi 6 Doble Banda','DGO Básico (60+ canales)','Latencia ultra-baja'] },
+  { id:'p1000', nombre:'1000 Mbps + DGO Full', tag:null, promo:79.90, mesesPromo:1, regular:139.90,
+    detalles:['2 Extensores Mesh WiFi 6','DGO Full Premium','Soporte prioritario 4h'] },
+  { id:'p750', nombre:'750 Mbps Fibra Pura', tag:null, promo:null, mesesPromo:0, regular:109.00,
+    detalles:['ONT Óptica Gigabit','Consumo ilimitado','Tarifa fija garantizada 12m'] },
+];
+
+let users = [
+  { nombre:'Vendedor Demo', codigo:'VD-TEST-001', email:'demo@vendedor.com', password:'demo123' },
+  { nombre:'Ana Torres Vidal', codigo:'VD-002', email:'ana@vendedor.com', password:'demo123' },
+  { nombre:'Administrador WinIA', codigo:'', email:'admin@administrador.com', password:'admin123' },
+];
+
+let ventas = [
+  { codigo:'WV-948201', vendedorEmail:'demo@vendedor.com', cliente:'Carlos Morales Vega', dni:'44521098', celular:'978112233', direccion:'Av. Balta 742, Dpto 301', distrito:'Chiclayo', plan:'850 Mbps + DGO Hogar', promo:59.50, regular:119.00, estado:'VERIFICADA', fecha:'2026-02-23' },
+  { codigo:'WV-893112', vendedorEmail:'demo@vendedor.com', cliente:'Miriam Quiroz Delgado', dni:'72341908', celular:'944883311', direccion:'Calle Los Tumbos 142', distrito:'La Victoria', plan:'1000 Mbps + DGO Full', promo:79.90, regular:139.90, estado:'VERIFICADA', fecha:'2026-02-23' },
+  { codigo:'WV-761044', vendedorEmail:'demo@vendedor.com', cliente:'Renzo Paredes Castro', dni:'10084532', celular:'951339847', direccion:'Av. Kennedy 410', distrito:'José Leonardo Ortiz', plan:'850 Mbps + DGO Hogar', promo:59.50, regular:119.00, estado:'RECHAZADA', fecha:'2026-02-22' },
+  { codigo:'WV-552091', vendedorEmail:'ana@vendedor.com', cliente:'Jorge Salcedo Reque', dni:'40213988', celular:'987001122', direccion:'Jr. Progreso 220', distrito:'Nueva Arica', plan:'750 Mbps Fibra Pura', promo:null, regular:109.00, estado:'PENDIENTE', fecha:'2026-02-24' },
+];
+
+let currentUser = null; // { nombre, codigo, email, role }
+let authMode = 'login';
+
+let wizard = {
+  step: 1,
+  cliente: { nombre:'', dni:'', celular:'' },
+  lugar: { direccion:'', distrito:'' },
+  planId: null,
+  confirmado: false,
+};
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+function goTo(name){
+  ['landing','auth','dash-vendedor','wizard','dash-admin'].forEach(s=>{
+    document.getElementById('screen-'+s).classList.add('hidden');
+  });
+  document.getElementById('screen-'+name).classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function scrollToFeatures(){
+  document.getElementById('features').scrollIntoView({behavior:'smooth'});
+}
+
+/* =========================================================
+   AUTH
+   ========================================================= */
+function setAuthMode(mode){
+  authMode = mode;
+  document.getElementById('tab-login').classList.toggle('active', mode==='login');
+  document.getElementById('tab-register').classList.toggle('active', mode==='register');
+  document.getElementById('form-login').classList.toggle('hidden', mode!=='login');
+  document.getElementById('form-register').classList.toggle('hidden', mode!=='register');
+  document.getElementById('auth-alert').innerHTML='';
+}
+
+function togglePass(inputId, btn){
+  const input = document.getElementById(inputId);
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  btn.innerHTML = isPass ? ICON_EYE_OFF : ICON_EYE;
+}
+
+function fillDemo(kind){
+  setAuthMode('login');
+  if(kind==='vendedor'){
+    document.getElementById('login-email').value='demo@vendedor.com';
+    document.getElementById('login-password').value='demo123';
+  } else {
+    document.getElementById('login-email').value='admin@administrador.com';
+    document.getElementById('login-password').value='admin123';
+  }
+}
+
+function showAuthAlert(msg){
+  document.getElementById('auth-alert').innerHTML =
+    '<div class="alert alert-error">'+ICON_ALERT+'<div>'+msg+'</div></div>';
+}
+
+function detectRole(email){
+  const parts = email.toLowerCase().split('@');
+  if(parts.length !== 2) return null;
+  const domain = parts[1];
+  if(domain.startsWith('administrador')) return 'admin';
+  if(domain.startsWith('vendedor')) return 'vendedor';
+  return null;
+}
+
+function handleLogin(e){
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  if(!email || !password){ showAuthAlert('Completa correo y contraseña.'); return; }
+
+  const role = detectRole(email);
+  if(!role){ showAuthAlert('El correo debe pertenecer a un dominio @vendedor.com o @administrador.com'); return; }
+
+  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if(!user || user.password !== password){ showAuthAlert('Credenciales incorrectas.'); return; }
+
+  currentUser = { nombre:user.nombre, codigo:user.codigo, email:user.email, role };
+  enterApp();
+}
+
+function handleRegister(e){
+  e.preventDefault();
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const codigo = document.getElementById('reg-codigo').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+
+  if(!nombre || !email || !password){ showAuthAlert('Nombre, correo y contraseña son obligatorios.'); return; }
+  if(password.length < 6){ showAuthAlert('La contraseña debe tener al menos 6 caracteres.'); return; }
+
+  const role = detectRole(email);
+  if(!role){ showAuthAlert('El correo debe pertenecer a un dominio @vendedor.com o @administrador.com'); return; }
+
+  if(users.some(u=>u.email.toLowerCase()===email.toLowerCase())){ showAuthAlert('Ya existe una cuenta con ese correo.'); return; }
+
+  users.push({ nombre, codigo, email, password });
+  currentUser = { nombre, codigo, email, role };
+  enterApp();
+}
+
+function enterApp(){
+  document.getElementById('auth-alert').innerHTML='';
+  document.getElementById('form-login').reset();
+  document.getElementById('form-register').reset();
+  if(currentUser.role === 'admin'){
+    renderAdmin();
+    goTo('dash-admin');
+  } else {
+    renderVendedor();
+    goTo('dash-vendedor');
+  }
+}
+
+function logout(){
+  currentUser = null;
+  goTo('landing');
+}
+
+/* =========================================================
+   DASHBOARD VENDEDOR
+   ========================================================= */
+function renderVendedor(){
+  document.getElementById('v-nombre').textContent = currentUser.nombre;
+  document.getElementById('v-nombre2').textContent = currentUser.nombre;
+  document.getElementById('v-codigo').textContent = currentUser.codigo || currentUser.email;
+
+  const misVentas = ventas.filter(v => v.vendedorEmail === currentUser.email);
+  const verificadas = misVentas.filter(v=>v.estado==='VERIFICADA').length;
+  const rechazadas = misVentas.filter(v=>v.estado==='RECHAZADA').length;
+
+  document.getElementById('v-total').textContent = misVentas.length;
+  document.getElementById('v-verificadas').textContent = verificadas;
+  document.getElementById('v-rechazadas').textContent = rechazadas;
+
+  const wrap = document.getElementById('v-tabla-wrap');
+  if(misVentas.length === 0){
+    wrap.innerHTML = '<div class="empty-state"><div class="big">📭</div>No hay ventas registradas</div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <table>
+      <thead><tr><th>Código</th><th>Cliente</th><th>Plan</th><th>Estado</th><th>Fecha</th></tr></thead>
+      <tbody>
+        ${misVentas.slice().reverse().map(v=>`
+          <tr>
+            <td class="cell-code">${v.codigo}</td>
+            <td>${v.cliente}<div class="cell-sub">DNI ${v.dni}</div></td>
+            <td>${v.plan}<div class="cell-sub">${v.distrito}</div></td>
+            <td>${badge(v.estado)}</td>
+            <td>${v.fecha}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function badge(estado){
+  const map = { VERIFICADA:'badge-verificada', RECHAZADA:'badge-rechazada', PENDIENTE:'badge-pendiente' };
+  return `<span class="badge ${map[estado]}">${estado}</span>`;
+}
+
+/* =========================================================
+   WIZARD
+   ========================================================= */
+const STEP_LABELS = ['Cliente','Lugar','Plan','Revisar'];
+
+function startWizard(){
+  wizard = { step:1, cliente:{nombre:'',dni:'',celular:''}, lugar:{direccion:'',distrito:''}, planId:null, confirmado:false };
+  document.getElementById('f-nombre').value='';
+  document.getElementById('f-dni').value='';
+  document.getElementById('f-celular').value='';
+  document.getElementById('f-direccion').value='';
+  document.getElementById('f-distrito').value='';
+  document.getElementById('w-vendedor').textContent = currentUser.nombre;
+  document.getElementById('w-codigo').textContent = currentUser.codigo || currentUser.email;
+  renderPlanGrid();
+  goToStep(1);
+  goTo('wizard');
+}
+
+function cancelWizard(){
+  renderVendedor();
+  goTo('dash-vendedor');
+}
+
+function wizardAlert(msg){
+  document.getElementById('wizard-alert').innerHTML = msg
+    ? '<div class="alert alert-error">'+ICON_ALERT+'<div>'+msg+'</div></div>'
+    : '';
+}
+
+function renderSteps(){
+  const bar = document.getElementById('steps-bar');
+  bar.innerHTML = STEP_LABELS.map((label,i)=>{
+    const n = i+1;
+    let circleClass='', itemClass='';
+    if(n < wizard.step){ circleClass='done'; }
+    else if(n === wizard.step){ circleClass='active'; itemClass='current'; }
+    return `
+      <div class="step-item ${itemClass}">
+        <div class="step-circle ${circleClass}">${n < wizard.step ? ICON_CHECK : n}</div>
+        <div class="step-text">
+          <div class="t1">Paso ${n}</div>
+          <div class="t2">${label}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function goToStep(n){
+  wizard.step = n;
+  wizardAlert('');
+  document.querySelectorAll('.step-pane').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('step-'+n).classList.remove('hidden');
+  renderSteps();
+
+  document.getElementById('btn-prev').classList.toggle('hidden', n===1);
+  document.getElementById('btn-cancel').classList.toggle('hidden', n!==4);
+  document.getElementById('btn-next').textContent = n===4 ? 'Enviar Venta' : 'Siguiente →';
+  document.getElementById('btn-next').onclick = n===4 ? submitVenta : nextStep;
+
+  if(n===3) renderPlanGrid();
+  if(n===4) renderReview();
+}
+
+function prevStep(){ if(wizard.step>1) goToStep(wizard.step-1); }
+
+function nextStep(){
+  if(wizard.step===1){
+    const nombre = document.getElementById('f-nombre').value.trim();
+    const dni = document.getElementById('f-dni').value.trim();
+    const celular = document.getElementById('f-celular').value.trim();
+    if(!nombre || !dni || !celular){ wizardAlert('Todos los campos son obligatorios.'); return; }
+    if(!/^\d{8}$/.test(dni)){ wizardAlert('El DNI debe tener exactamente 8 dígitos numéricos.'); return; }
+    if(!/^\d{9}$/.test(celular)){ wizardAlert('El celular debe tener exactamente 9 dígitos numéricos.'); return; }
+    wizard.cliente = { nombre, dni, celular };
+    goToStep(2);
+    return;
+  }
+  if(wizard.step===2){
+    const direccion = document.getElementById('f-direccion').value.trim();
+    const distrito = document.getElementById('f-distrito').value;
+    if(!direccion || !distrito){ wizardAlert('Dirección y distrito son obligatorios.'); return; }
+    wizard.lugar = { direccion, distrito };
+    goToStep(3);
+    return;
+  }
+  if(wizard.step===3){
+    if(!wizard.planId){ wizardAlert('Selecciona un plan para continuar.'); return; }
+    if(!wizard.confirmado){ wizardAlert('Debes confirmar que explicaste el desglose de precio al cliente.'); return; }
+    goToStep(4);
+    return;
+  }
+}
+
+function renderPlanGrid(){
+  const grid = document.getElementById('plan-grid');
+  grid.innerHTML = PLANS.map(p=>`
+    <div class="plan-card ${wizard.planId===p.id?'selected':''}" onclick="selectPlan('${p.id}')">
+      ${p.tag ? `<span class="tag">${p.tag}</span>` : ''}
+      <div class="radio-dot"></div>
+      <h4>${p.nombre}</h4>
+      <ul>${p.detalles.map(d=>`<li>${d}</li>`).join('')}</ul>
+      <div class="price-line">
+        ${p.promo ? `PROMO MES 1: S/ ${p.promo.toFixed(2)}<br>Desde mes 2: S/ ${p.regular.toFixed(2)}` : `TARIFA PLANA: S/ ${p.regular.toFixed(2)} / mes`}
+      </div>
+    </div>`).join('');
+  renderPriceBreakdown();
+}
+
+function selectPlan(id){
+  wizard.planId = id;
+  wizard.confirmado = false;
+  wizardAlert('');
+  renderPlanGrid();
+}
+
+function renderPriceBreakdown(){
+  const wrap = document.getElementById('price-breakdown-wrap');
+  if(!wizard.planId){ wrap.innerHTML=''; return; }
+  const plan = PLANS.find(p=>p.id===wizard.planId);
+  const mes1 = plan.promo ? plan.promo : plan.regular;
+
+  wrap.innerHTML = `
+    <div class="price-breakdown">
+      <div class="pb-title">💰 DESGLOSE DE PRECIO</div>
+      <div class="pb-grid">
+        <div class="pb-box">
+          <div class="k">Mes 1</div>
+          <div class="v">S/ ${mes1.toFixed(2)}</div>
+          <div class="note">${plan.promo ? 'Precio promocional de bienvenida' : 'Tarifa plana desde el primer mes'}</div>
+        </div>
+        <div class="pb-box regular">
+          <div class="k">Desde mes 2</div>
+          <div class="v">S/ ${plan.regular.toFixed(2)}</div>
+          <div class="note">PRECIO REGULAR</div>
+        </div>
+      </div>
+      <label class="pb-check">
+        <input type="checkbox" id="confirm-check" ${wizard.confirmado?'checked':''} onchange="wizard.confirmado=this.checked; wizardAlert('');">
+        <span>✓ Confirmo que le expliqué al cliente el desglose de precio anterior.</span>
+      </label>
+    </div>`;
+}
+
+function renderReview(){
+  const plan = PLANS.find(p=>p.id===wizard.planId);
+  const mes1 = plan.promo ? plan.promo : plan.regular;
+  document.getElementById('review-wrap').innerHTML = `
+    <div class="review-block">
+      <h4>Cliente</h4>
+      <div class="review-row"><span>Nombre</span><span>${wizard.cliente.nombre}</span></div>
+      <div class="review-row"><span>DNI</span><span>${wizard.cliente.dni}</span></div>
+      <div class="review-row"><span>Celular</span><span>${wizard.cliente.celular}</span></div>
+    </div>
+    <div class="review-block">
+      <h4>Ubicación</h4>
+      <div class="review-row"><span>Dirección</span><span>${wizard.lugar.direccion}</span></div>
+      <div class="review-row"><span>Distrito</span><span>${wizard.lugar.distrito}</span></div>
+    </div>
+    <div class="review-block">
+      <h4>Plan</h4>
+      <div class="review-row"><span>Plan contratado</span><span>${plan.nombre}</span></div>
+      <div class="review-row"><span>Mes 1</span><span>S/ ${mes1.toFixed(2)}</span></div>
+      <div class="review-row"><span>Desde mes 2 (regular)</span><span>S/ ${plan.regular.toFixed(2)}</span></div>
+    </div>`;
+}
+
+function submitVenta(){
+  const plan = PLANS.find(p=>p.id===wizard.planId);
+  const codigo = 'WV-' + String(Date.now()).slice(-6);
+  ventas.push({
+    codigo,
+    vendedorEmail: currentUser.email,
+    cliente: wizard.cliente.nombre,
+    dni: wizard.cliente.dni,
+    celular: wizard.cliente.celular,
+    direccion: wizard.lugar.direccion,
+    distrito: wizard.lugar.distrito,
+    plan: plan.nombre,
+    promo: plan.promo,
+    regular: plan.regular,
+    estado: 'PENDIENTE',
+    fecha: new Date().toISOString().slice(0,10),
+  });
+
+  wizardAlert('');
+  document.getElementById('wizard-alert').innerHTML =
+    '<div class="alert alert-success">'+ICON_CHECK+'<div><b>Venta '+codigo+' registrada con éxito.</b> Quedó en estado PENDIENTE de verificación.</div></div>';
+
+  setTimeout(()=>{
+    renderVendedor();
+    goTo('dash-vendedor');
+  }, 1400);
+}
+
+/* =========================================================
+   DASHBOARD ADMIN
+   ========================================================= */
+function renderAdmin(){
+  document.getElementById('a-nombre').textContent = currentUser.nombre;
+
+  const vendedores = users.filter(u => detectRole(u.email) === 'vendedor');
+  document.getElementById('a-vendedores').textContent = vendedores.length;
+  document.getElementById('a-total').textContent = ventas.length;
+  document.getElementById('a-verificadas').textContent = ventas.filter(v=>v.estado==='VERIFICADA').length;
+  document.getElementById('a-rechazadas').textContent = ventas.filter(v=>v.estado==='RECHAZADA').length;
+
+  document.getElementById('a-vendedores-tabla').innerHTML = `
+    <table>
+      <thead><tr><th>Vendedor</th><th>Código</th><th>Total</th><th>Verificadas</th><th>Rechazadas</th></tr></thead>
+      <tbody>
+        ${vendedores.map(v=>{
+          const suyas = ventas.filter(x=>x.vendedorEmail===v.email);
+          const ver = suyas.filter(x=>x.estado==='VERIFICADA').length;
+          const rec = suyas.filter(x=>x.estado==='RECHAZADA').length;
+          return `<tr>
+            <td>${v.nombre}<div class="cell-sub">${v.email}</div></td>
+            <td class="cell-code">${v.codigo || '—'}</td>
+            <td>${suyas.length}</td>
+            <td style="color:var(--green);font-weight:700;">${ver}</td>
+            <td style="color:var(--red);font-weight:700;">${rec}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+
+  const filtro = document.getElementById('a-filtro-estado').value;
+  const lista = filtro ? ventas.filter(v=>v.estado===filtro) : ventas;
+  const tablaVentas = document.getElementById('a-ventas-tabla');
+  if(lista.length === 0){
+    tablaVentas.innerHTML = '<div class="empty-state"><div class="big">📭</div>No hay ventas para este filtro</div>';
+  } else {
+    tablaVentas.innerHTML = `
+      <table>
+        <thead><tr><th>Código</th><th>Vendedor</th><th>Cliente</th><th>Plan</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <tbody>
+          ${lista.slice().reverse().map(v=>{
+            const vend = users.find(u=>u.email===v.vendedorEmail);
+            return `<tr>
+              <td class="cell-code">${v.codigo}</td>
+              <td>${vend ? vend.nombre : v.vendedorEmail}</td>
+              <td>${v.cliente}<div class="cell-sub">DNI ${v.dni}</div></td>
+              <td>${v.plan}<div class="cell-sub">${v.distrito}</div></td>
+              <td>${badge(v.estado)}</td>
+              <td>${v.fecha}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+}
+</script>
+</body>
+</html>
