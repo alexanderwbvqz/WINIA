@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WinIA - Verificación de Ventas con IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#0D1B2A;
@@ -50,11 +50,11 @@
 
   /* ---------- Top nav (landing) ---------- */
   .topbar{
-    background:var(--navy);
-    color:#fff;
+    background:#fff;
+    color:var(--text);
     padding:16px 0;
     position:sticky;top:0;z-index:20;
-    border-bottom:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid var(--border);
   }
   .topbar .container{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-0.01em;}
@@ -82,38 +82,82 @@
   .btn-danger:hover{background:var(--red-bg);}
   .btn-block{width:100%;}
   .btn-sm{padding:8px 14px;font-size:13px;}
+  .btn-pill{border-radius:999px;}
 
   /* ---------- Landing hero ---------- */
-  .hero{padding:72px 0 56px;}
+  .hero{padding:64px 0 72px;overflow:hidden;}
+  .hero .container{
+    display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:center;
+  }
   .pill{
     display:inline-flex;align-items:center;gap:8px;background:rgba(255,102,0,.08);
     color:var(--orange);border:1px solid rgba(255,102,0,.25);padding:6px 14px;border-radius:999px;
     font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
   }
   .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
-  .hero h1{font-size:44px;line-height:1.08;margin:20px 0 16px;letter-spacing:-0.02em;max-width:720px;}
+  .hero h1{font-size:48px;font-weight:800;line-height:1.06;margin:20px 0 16px;letter-spacing:-0.025em;}
   .hero h1 span{color:var(--orange);}
-  .hero p.lead{font-size:17px;color:var(--text-muted);max-width:620px;line-height:1.6;margin:0 0 28px;}
-  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
-  .stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:48px;}
-  .stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:0 1px 3px 0 rgba(13,27,42,.04);}
-  .stat-card .label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft);margin-bottom:8px;}
-  .stat-card .value{font-size:30px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;}
-  .stat-card .value.green{color:var(--green);}
-  .stat-card .sub{font-size:13px;color:var(--text-muted);margin-top:4px;}
+  .hero p.lead{font-size:17px;color:var(--text-muted);max-width:520px;line-height:1.6;margin:0 0 28px;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .hero-microline{
+    display:flex;align-items:center;gap:8px;margin-top:18px;font-size:13.5px;color:var(--text-muted);font-weight:600;
+  }
+  .hero-microline svg{color:var(--orange);}
+
+  /* Illustration */
+  .hero-illustration{position:relative;display:flex;align-items:center;justify-content:center;min-height:420px;}
+  .illus-glow{
+    position:absolute;width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle, rgba(255,102,0,.16), transparent 70%);
+  }
+  .illus-card{
+    position:relative;width:100%;max-width:360px;aspect-ratio:1/1;border-radius:28px;
+    background:linear-gradient(160deg,#FFF4EC,#FFE6D2);
+    border:1px solid #FFD9B3;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 20px 40px -12px rgba(255,102,0,.25);
+  }
+  .illus-ring{
+    width:150px;height:150px;border-radius:50%;background:#fff;border:2px solid var(--orange);
+    display:flex;align-items:center;justify-content:center;color:var(--orange);
+    box-shadow:0 0 0 10px rgba(255,102,0,.1);
+  }
+  .illus-ring svg{width:52px;height:52px;}
+  .illus-note{
+    position:absolute;top:6%;left:2%;font-family:'Caveat',cursive;font-weight:700;font-size:22px;
+    color:var(--orange);transform:rotate(-6deg);text-align:center;line-height:1.15;
+  }
+  .float-card{
+    position:absolute;background:#fff;border:1px solid var(--border);border-radius:12px;
+    padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 24px -8px rgba(13,27,42,.15);
+    font-size:12.5px;white-space:nowrap;
+  }
+  .float-card .fc-icon{
+    width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  }
+  .float-card .fc-icon.green{background:var(--green-bg);color:var(--green);}
+  .float-card .fc-icon.orange{background:#FFF4EC;color:var(--orange);}
+  .float-card .fc-title{font-weight:700;color:var(--text);}
+  .float-card .fc-sub{color:var(--text-soft);font-size:11px;}
+  .float-card.fc-1{top:8%;right:-4%;}
+  .float-card.fc-2{bottom:26%;left:-8%;}
+  .float-card.fc-3{bottom:2%;right:4%;}
+
+  @media(max-width:900px){
+    .hero .container{grid-template-columns:1fr;}
+    .hero-illustration{order:-1;min-height:320px;margin-bottom:8px;}
+    .hero h1{max-width:none;}
+  }
+  @media(max-width:480px){
+    .float-card{padding:8px 10px;font-size:11.5px;}
+    .float-card .fc-icon{width:26px;height:26px;}
+    .float-card.fc-1{right:-2%;}
+    .float-card.fc-2{left:-4%;}
+  }
 
   .section{padding:56px 0;}
   .section-title{font-size:28px;margin:0 0 8px;letter-spacing:-0.015em;}
   .section-sub{color:var(--text-muted);margin:0 0 32px;font-size:15px;max-width:640px;}
-  .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;}
-  .feature-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:24px;}
-  .feature-card .icon{
-    width:42px;height:42px;border-radius:8px;background:var(--navy);color:var(--orange);
-    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
-  }
-  .feature-card h3{font-size:16px;margin:0 0 8px;}
-  .feature-card p{font-size:14px;color:var(--text-muted);line-height:1.55;margin:0;}
-
   .footer{background:var(--navy);color:rgba(255,255,255,.65);padding:24px 0;margin-top:auto;}
   .footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;}
 
@@ -320,80 +364,7 @@
     .page-top{flex-direction:column;}
   }
 
-  /* ---------- Pitch sections ---------- */
-  .section-dark{background:var(--navy);color:#fff;padding:64px 0;}
-  .section-dark .section-title{color:#fff;}
-  .section-dark .section-sub{color:rgba(255,255,255,.65);}
-
-  .bigstat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
-  @media(max-width:700px){.bigstat-grid{grid-template-columns:1fr;}}
-  .bigstat-card{
-    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:22px;
-  }
-  .bigstat-card .num{font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:var(--orange);}
-  .bigstat-card .desc{font-size:13.5px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.5;}
-  .bigstat-card .delta{font-size:12px;color:#6EE7B7;margin-top:6px;font-weight:600;}
-  .callout-red{
-    background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:16px 20px;
-    font-size:14.5px;color:#FCA5A5;
-  }
-  .callout-red b{color:#fff;}
-  .source-note{font-size:12px;color:var(--text-soft);margin-top:16px;font-style:italic;}
-  .section-dark .source-note{color:rgba(255,255,255,.45);}
-
-  .step-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:12px;}
-  @media(max-width:700px){.step-flow{grid-template-columns:1fr;}}
-  .flow-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;}
-  .flow-card .flow-num{
-    width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--orange);font-weight:800;font-size:13px;
-    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
-  }
-  .flow-card h3{font-size:16px;margin:0 0 8px;}
-  .flow-card p{font-size:13.5px;color:var(--text-muted);margin:0;line-height:1.55;}
-
-  .stage-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-  .stage-table th{background:#F8FAFC;text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-soft);border-bottom:1px solid var(--border);}
-  .stage-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top;}
-  .stage-table tr:last-child td{border-bottom:none;}
-  .stage-table .stage-num{
-    font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--orange);
-  }
-  .table-wrap{overflow-x:auto;margin-bottom:16px;}
-
-  .win-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  @media(max-width:800px){.win-grid{grid-template-columns:1fr;}}
-  .win-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;}
-  .win-card .who{font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;}
-  .win-card ul{margin:0;padding-left:18px;font-size:14px;color:var(--text);line-height:1.9;}
-  .win-card .metrics{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--green-text);line-height:1.8;}
-
-  .compare-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-  .compare-table th{padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.03em;text-align:left;border-bottom:1px solid var(--border);}
-  .compare-table th.hoy{background:#F8FAFC;color:var(--text-muted);}
-  .compare-table th.con{background:#FFF4EC;color:#9A3412;}
-  .compare-table td{padding:14px 16px;font-size:13.5px;border-bottom:1px solid var(--border);}
-  .compare-table tr:last-child td{border-bottom:none;}
-  .compare-table td.label{font-weight:700;color:var(--text-soft);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;}
-  .compare-table td.win{color:var(--green-text);font-weight:600;background:#F7FEFB;}
-
-  .tracion-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  @media(max-width:800px){.tracion-grid{grid-template-columns:1fr;}}
-  .tracion-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;}
-  .tracion-card .place{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
-  .tracion-card p{font-size:13.5px;color:var(--text-muted);line-height:1.6;margin:0;}
-  .tracion-card b{color:var(--text);}
-
-  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  @media(max-width:800px){.team-grid{grid-template-columns:1fr;}}
-  .team-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;text-align:left;}
-  .avatar-circle{
-    width:46px;height:46px;border-radius:50%;background:var(--navy);color:var(--orange);font-weight:800;font-size:15px;
-    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
-  }
-  .team-card h3{font-size:15px;margin:0 0 2px;}
-  .team-card .role{font-size:12.5px;color:var(--orange);font-weight:600;margin-bottom:10px;}
-  .team-card p{font-size:13px;color:var(--text-muted);margin:0;line-height:1.55;}
-
+  /* ---------- Closing CTA ---------- */
   .cta-band{
     background:var(--navy);border-radius:16px;padding:48px 36px;text-align:center;color:#fff;
     background-image:radial-gradient(circle at 20% 20%, rgba(255,102,0,.18), transparent 45%);
@@ -411,194 +382,40 @@
     <div class="container">
       <div class="logo"><span class="mark">W</span><span>Win<span class="ia">IA</span></span></div>
       <div style="display:flex;gap:10px;">
-        <button class="btn btn-primary" onclick="goTo('auth')">Panel del Vendedor</button>
+        <button class="btn btn-primary btn-pill" onclick="goTo('auth')">Panel del Vendedor ${ICON_ARROW}</button>
       </div>
     </div>
   </header>
 
   <section class="hero">
     <div class="container">
-      <span class="pill"><span class="dot"></span> Verificación de ventas con IA conversacional</span>
-      <h1>Que lo prometido sea <span>lo entregado</span></h1>
-      <p class="lead">WinIA llama a cada cliente antes de instalar el servicio y confirma, en menos de dos minutos, que la venta registrada es la venta que realmente aceptó. Sin auditores, sin muestreo, sobre el 100% de las ventas.</p>
-      <div class="hero-actions">
-        <button class="btn btn-primary" style="padding:13px 26px;" onclick="goTo('auth')">Ir al Panel del Vendedor →</button>
-        <button class="btn btn-outline" style="padding:13px 26px;" onclick="scrollToFeatures()">Ver la plataforma</button>
+      <div>
+        <span class="pill"><span class="dot"></span> Verificación de ventas con IA conversacional</span>
+        <h1>Que lo prometido sea <span>lo entregado</span></h1>
+        <p class="lead">WinIA llama a cada cliente antes de instalar el servicio y confirma, en menos de dos minutos, que la venta registrada es la venta que realmente aceptó. Sin auditores, sin muestreo, sobre el 100% de las ventas.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-pill" style="padding:14px 28px;" onclick="goTo('auth')">Ir al Panel del Vendedor ${ICON_ARROW}</button>
+        </div>
+        <div class="hero-microline">${ICON_CLOCK} Verificación de cada venta en menos de 2 minutos</div>
       </div>
-      <div class="stat-strip">
-        <div class="stat-card"><div class="label">Cobertura de auditoría</div><div class="value green">100%</div><div class="sub">De las ventas, una por una — no por muestreo</div></div>
-        <div class="stat-card"><div class="label">Tiempo de verificación</div><div class="value">&lt; 2 min</div><div class="sub">Antes de que salga el técnico</div></div>
-        <div class="stat-card"><div class="label">Checkpoints por llamada</div><div class="value">6</div><div class="sub">Identidad, plan, precio, promo, permanencia, dirección</div></div>
-      </div>
-    </div>
-  </section>
 
-  <!-- CONTEXTO / PROBLEMA -->
-  <section class="section-dark">
-    <div class="container">
-      <h2 class="section-title">La mayoría de reclamos telecom no nacen en la red: nacen en la venta</h2>
-      <p class="section-sub">Un cliente acepta un plan a S/ 79.90 al mes. Meses después, sin que nadie se lo haya explicado, el cobro sube a S/ 89.90. El resultado casi siempre es el mismo: un reclamo y una baja anticipada del servicio — un costo que, para ese momento, ya no se puede recuperar.</p>
-      <div class="bigstat-grid">
-        <div class="bigstat-card">
-          <div class="num">1 257 286</div>
-          <div class="desc">Reclamos en telecomunicaciones en el Perú durante 2026</div>
-          <div class="delta">+11.6% vs. 2025</div>
+      <div class="hero-illustration">
+        <div class="illus-glow"></div>
+        <div class="illus-note">Verificado<br>antes de instalar</div>
+        <div class="illus-card">
+          <div class="illus-ring">${ICON_PHONE}</div>
         </div>
-        <div class="bigstat-card">
-          <div class="num">254 437</div>
-          <div class="desc">Reclamos solo de internet fijo</div>
-          <div class="delta">+53.1% en un año</div>
+        <div class="float-card fc-1">
+          <div class="fc-icon green">${ICON_CHECK}</div>
+          <div><div class="fc-title">Cobertura 100%</div><div class="fc-sub">Una por una, sin muestreo</div></div>
         </div>
-        <div class="bigstat-card">
-          <div class="num">278 509</div>
-          <div class="desc">Nacen en la venta: promesas incumplidas y ventas no solicitadas</div>
-          <div class="delta" style="color:#FCA5A5;">1 de cada 5</div>
+        <div class="float-card fc-2">
+          <div class="fc-icon orange">${ICON_SHIELD_CHECK}</div>
+          <div><div class="fc-title">6 checkpoints</div><div class="fc-sub">Identidad, plan, precio…</div></div>
         </div>
-      </div>
-      <div class="callout-red"><b>4 de cada 10</b> reclamos son por facturación y cobro: el cliente paga algo distinto a lo que le prometieron.</div>
-      <p class="source-note">Fuente: OSIPTEL — reclamos de usuarios de telecomunicaciones, balance 2025.</p>
-    </div>
-  </section>
-
-  <!-- CÓMO FUNCIONA -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Un agente de IA que verifica antes de instalar</h2>
-      <p class="section-sub">Apenas se registra una venta, WinIA llama al cliente, conversa con él en su propio idioma y contrasta cada respuesta contra el plan cargado en el sistema.</p>
-      <div class="step-flow">
-        <div class="flow-card"><div class="flow-num">01</div><h3>Escucha</h3><p>Llama al cliente y le repite, en su idioma, qué compró.</p></div>
-        <div class="flow-card"><div class="flow-num">02</div><h3>Verifica</h3><p>Contrasta cada respuesta contra el plan registrado en el sistema.</p></div>
-        <div class="flow-card"><div class="flow-num">03</div><h3>Decide</h3><p>Aprueba la venta, la deriva a validación humana o bloquea la instalación.</p></div>
-      </div>
-      <div class="table-wrap" style="margin-top:24px;">
-        <table class="stage-table">
-          <thead><tr><th>#</th><th>Etapa</th><th>Detalle</th></tr></thead>
-          <tbody>
-            <tr><td class="stage-num">01</td><td>Venta registrada</td><td>El vendedor la carga en la plataforma (web/app). Queda congelada.</td></tr>
-            <tr><td class="stage-num">02</td><td>Llamada de verificación</td><td>El agente de IA llama al cliente y conversa.</td></tr>
-            <tr><td class="stage-num">03</td><td>Seis checkpoints</td><td>Identidad · plan · precio · fin de promoción · permanencia · dirección.</td></tr>
-            <tr><td class="stage-num">04</td><td>Score de riesgo</td><td>Explicable: indica en qué señal se basó la decisión.</td></tr>
-            <tr><td class="stage-num">05</td><td>Resultado</td><td>Aprueba · valida con un humano · bloquea.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="feature-card" style="margin-top:20px;">
-        <h3 style="margin-top:0;">¿Para quién es?</h3>
-        <p style="margin:0;">Operadores con fuerza de venta tercerizada (telecomunicaciones, ISPs regionales) y, en general, cualquier venta con una promesa a plazo: gas, seguros, energía, créditos.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- BENEFICIOS -->
-  <section class="section" style="padding-top:0;">
-    <div class="container">
-      <h2 class="section-title">Un mismo mecanismo, tres partes interesadas en que funcione</h2>
-      <div class="win-grid">
-        <div class="win-card">
-          <div class="who">Cliente</div>
-          <ul><li>Sabe exactamente qué compró y cuándo sube el precio.</li><li>Cero sorpresas en la factura.</li></ul>
-        </div>
-        <div class="win-card">
-          <div class="who">Vendedor</div>
-          <ul><li>Comisión garantizada en cuanto el cliente confirma la venta.</li><li>La venta correctamente explicada se paga más rápido.</li></ul>
-        </div>
-        <div class="win-card">
-          <div class="who">Operador</div>
-          <ul><li>Menos recursos invertidos en instalaciones que terminan en baja.</li></ul>
-          <div class="metrics">−40% instalaciones fallidas<br>−25% bajas anticipadas<br>−60% reclamos de facturación</div>
-        </div>
-      </div>
-      <p class="source-note">Cifras de impacto proyectadas sobre un flujo de ventas comercial típico; se validan con datos reales durante el piloto.</p>
-    </div>
-  </section>
-
-  <!-- COMPARATIVA -->
-  <section class="section" style="padding-top:0;">
-    <div class="container">
-      <h2 class="section-title">La auditoría tradicional llega tarde. WinIA llega antes.</h2>
-      <div class="table-wrap">
-        <table class="compare-table">
-          <thead><tr><th style="background:#fff;border-bottom:1px solid var(--border);"></th><th class="hoy">Auditoría tradicional</th><th class="con">Con WinIA</th></tr></thead>
-          <tbody>
-            <tr><td class="label">Cobertura</td><td>1–2% de las llamadas, por muestreo</td><td class="win">100% de las ventas, una por una</td></tr>
-            <tr><td class="label">Momento</td><td>Después de instalar y facturar</td><td class="win">Antes de que salga el técnico</td></tr>
-            <tr><td class="label">Resultado</td><td>Un reclamo y un cliente perdido</td><td class="win">Venta corregida o bloqueada, con evidencia</td></tr>
-            <tr><td class="label">Quién decide</td><td>Un auditor, semanas después</td><td class="win">Un score explicable, en minutos</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- RESPALDO / EVIDENCIA -->
-  <section class="section" style="padding-top:0;">
-    <div class="container">
-      <h2 class="section-title">El modelo de verificación por voz no es nuevo — falta traerlo al campo</h2>
-      <div class="tracion-grid">
-        <div class="tracion-card">
-          <div class="place">Estados Unidos · Third Party Verification</div>
-          <p>Verificar la venta con un tercero antes de activar el servicio es una práctica establecida en telecomunicaciones y energía desde los años 90, impulsada por las reglas de la FCC contra el cambio no autorizado de operador.</p>
-        </div>
-        <div class="tracion-card">
-          <div class="place">Control de calidad con IA</div>
-          <p>El control de calidad manual audita apenas entre <b>1% y 2%</b> de las llamadas. Plataformas de QA con IA como Observe.AI, Convin o Level AI ya auditan el <b>100%</b>.</p>
-        </div>
-        <div class="tracion-card">
-          <div class="place">Impacto medido</div>
-          <p>Un centro de contacto que migró a auditoría de IA sobre el 100% de sus llamadas reportó <b>−30%</b> en escalaciones por incumplimiento y <b>+22%</b> en satisfacción del cliente.</p>
-        </div>
-      </div>
-      <p class="source-note">Fuentes: FCC (reglas anti-slamming, 47 CFR 64.1120) · AnswerNet, TPV en telecom · Gistly, «The AI QA Revolution: From Sampling 2% to Auditing 100%».</p>
-    </div>
-  </section>
-
-  <!-- EQUIPO -->
-  <section class="section" style="padding-top:0;">
-    <div class="container">
-      <h2 class="section-title">Un equipo con experiencia directa en telecomunicaciones e IA de voz</h2>
-      <div class="team-grid">
-        <div class="team-card">
-          <div class="avatar-circle">CF</div>
-          <h3>Cristhian Fernández</h3>
-          <div class="role">Ingeniero de Sistemas</div>
-          <p>+10 años construyendo sistemas. Actualmente en una empresa internacional de telecomunicaciones. Maestría en Inteligencia Artificial.</p>
-        </div>
-        <div class="team-card">
-          <div class="avatar-circle">WB</div>
-          <h3>Walter Barreto</h3>
-          <div class="role">Ingeniero de Sistemas</div>
-          <p>+3 años en desarrollo de software. Especialista en backend y bases de datos.</p>
-        </div>
-        <div class="team-card">
-          <div class="avatar-circle">UR</div>
-          <h3>Ubil Rodríguez</h3>
-          <div class="role">Ingeniero de Sistemas</div>
-          <p>+5 años en frontend, con experiencia en llamadas con LLM y ElevenLabs. Maestría en IA por la UNI.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PLATAFORMA / PRODUCTO -->
-  <section class="section" id="features" style="padding-top:0;">
-    <div class="container">
-      <h2 class="section-title">Un panel para el equipo comercial, otro para la gestión</h2>
-      <p class="section-sub">Un mismo acceso para tu equipo comercial y para el área administrativa, cada uno con su propio panel.</p>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="icon">💰</div>
-          <h3>Desglose de precio obligatorio</h3>
-          <p>El vendedor debe confirmar en pantalla el precio promocional del mes 1 y el precio regular desde el mes 2, antes de continuar con la venta.</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🛡️</div>
-          <h3>Auditoría en tiempo real</h3>
-          <p>Cada venta registrada queda con estado de verificación: pendiente, verificada o rechazada, visible tanto para el vendedor como para el administrador.</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">📊</div>
-          <h3>Panel administrador</h3>
-          <p>Visión consolidada de todos los vendedores, ventas del sistema y métricas de cumplimiento en un solo dashboard.</p>
+        <div class="float-card fc-3">
+          <div class="fc-icon green">${ICON_CLOCK}</div>
+          <div><div class="fc-title">&lt; 2 min</div><div class="fc-sub">Antes de salir el técnico</div></div>
         </div>
       </div>
     </div>
@@ -928,6 +745,10 @@ const ICON_LOGOUT = svg('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><pol
 const ICON_PLUS = svg('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>');
 const ICON_CHECK = svg('<polyline points="20 6 9 17 4 12"/>');
 const ICON_ALERT = svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>');
+const ICON_CLOCK = svg('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');
+const ICON_PHONE = svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/>');
+const ICON_SHIELD_CHECK = svg('<path d="M12 2 3.5 6v6c0 5 3.6 8.7 8.5 10 4.9-1.3 8.5-5 8.5-10V6L12 2Z"/><polyline points="9 12 11.5 14.5 15.5 9.5"/>');
+const ICON_ARROW = svg('<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>');
 
 // Patch icon placeholders into markup that was authored with ${} template markers.
 document.body.innerHTML = document.body.innerHTML
@@ -935,7 +756,11 @@ document.body.innerHTML = document.body.innerHTML
   .replaceAll('${ICON_LOGOUT}', ICON_LOGOUT)
   .replaceAll('${ICON_PLUS}', ICON_PLUS)
   .replaceAll('${ICON_CHECK}', ICON_CHECK)
-  .replaceAll('${ICON_ALERT}', ICON_ALERT);
+  .replaceAll('${ICON_ALERT}', ICON_ALERT)
+  .replaceAll('${ICON_CLOCK}', ICON_CLOCK)
+  .replaceAll('${ICON_PHONE}', ICON_PHONE)
+  .replaceAll('${ICON_SHIELD_CHECK}', ICON_SHIELD_CHECK)
+  .replaceAll('${ICON_ARROW}', ICON_ARROW);
 
 /* =========================================================
    STATE (in-memory only, resets on reload)
@@ -983,10 +808,6 @@ function goTo(name){
   document.getElementById('screen-'+name).classList.remove('hidden');
   window.scrollTo(0,0);
 }
-function scrollToFeatures(){
-  document.getElementById('features').scrollIntoView({behavior:'smooth'});
-}
-
 /* =========================================================
    AUTH
    ========================================================= */
