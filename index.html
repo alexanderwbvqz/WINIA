@@ -161,6 +161,33 @@
   .footer{background:var(--navy);color:rgba(255,255,255,.65);padding:24px 0;margin-top:auto;}
   .footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;}
 
+  /* ---------- Floating assistant ---------- */
+  @keyframes assistant-float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+  }
+  .assistant-widget{
+    position:fixed;right:20px;bottom:20px;z-index:100;cursor:pointer;
+  }
+  .assistant-widget img{
+    width:84px;height:84px;object-fit:contain;display:block;
+    animation:assistant-float 3.2s ease-in-out infinite;
+    filter:drop-shadow(0 10px 18px rgba(13,27,42,.25));
+    transition:transform .15s;
+  }
+  .assistant-widget:hover img{transform:scale(1.06);}
+  .assistant-bubble{
+    position:absolute;bottom:100%;right:0;margin-bottom:10px;background:#fff;color:var(--text);
+    border:1px solid var(--border);border-radius:12px 12px 2px 12px;padding:9px 14px;font-size:12.5px;font-weight:600;
+    white-space:nowrap;box-shadow:0 10px 24px -8px rgba(13,27,42,.2);
+    opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s,transform .18s;
+  }
+  .assistant-widget:hover .assistant-bubble{opacity:1;transform:translateY(0);}
+  @media(max-width:480px){
+    .assistant-widget{right:14px;bottom:14px;}
+    .assistant-widget img{width:64px;height:64px;}
+  }
+
   /* ---------- Auth screen ---------- */
   .auth-wrap{
     flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px;
@@ -732,6 +759,12 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- =================== ASISTENTE FLOTANTE =================== -->
+<div class="assistant-widget">
+  <div class="assistant-bubble">¡Hola! Soy WinIA 👋</div>
+  <img src="images/asistente.png" alt="Asistente WinIA">
 </div>
 
 <script>
